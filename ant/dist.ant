@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+	Does all the packing. That is, creates the files that live in dist/
+-->
+
+<project name="dist">
+	<target name="zips" depends="serverprocesszip,wizard,plugins">
+	</target>
+	
+	<target name="check-ggs" unless="ggs.exists">
+		<available property="ggs.exists" file="lib/GgServer.jar"/>
+	</target>
+	<target name="serverprocesszip" if="${ggs.exists}" depends="check-ggs,dpsjar,dmcjar">
+		<delete file="${pack.serverprocess}"/>
+		<zip destfile="${pack.serverprocess}">
+			<fileset dir="${file.home}/server" />
+			<fileset dir="${dist.home}" includes="Components/**/**" />
+			<fileset dir="." includes="LICENSE.txt"/>
+		</zip>
+	</target>
+	
+	<target name="dmcjar">
+		<delete file="${jar.dmc}" />
+		<jar destfile="${jar.dmc}" manifest="${file.home}/MANIFEST.components.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupWizard/dmc/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupWizard/dmc/*.java" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	<target name="dpsjar">
+		<delete file="${jar.dps}" />
+		<jar destfile="${jar.dps}" manifest="${file.home}/MANIFEST.components.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupWizard/*.class" />
+				<include name="**/markupWizard/dps/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupWizard/*.java" />
+				<include name="**/markupWizard/dps/*.java" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	
+	<target name="check-gg" unless="gg.exists">
+		<available property="gg.exists" file="lib/GoldenGATE.jar"/>
+	</target>
+	<target name="plugins" if="${gg.exists}" depends="check-gg,processmanagerjar,wizardmanagerjar,dmcmanagerjar,dpsmanager">
+	</target>
+	
+	<target name="processmanagerjar">
+		<delete file="${jar.processmanager}" />
+		<jar destfile="${jar.processmanager}" manifest="${file.home}/MANIFEST.components.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupProcess/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupProcess/*.java" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	<target name="wizardmanagerjar">
+		<delete file="${jar.wizardmanager}" />
+		<jar destfile="${jar.wizardmanager}" manifest="${file.home}/MANIFEST.components.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupWizard/*.class" />
+				<include name="**/markupWizard/manager/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupWizard/*.java" />
+				<include name="**/markupWizard/manager/*.java" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+		<copy todir="${dist.home}/Plugins/MarkupWizardData">
+			<fileset dir="${dist.home}/Wizard" includes="*.jar" />
+		</copy>
+	</target>
+	
+	<target name="dmcmanagerjar">
+		<delete file="${jar.dmcmanager}" />
+		<jar destfile="${jar.dmcmanager}" manifest="${file.home}/MANIFEST.components.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupWizard/dmc/GoldenGateDmcConstants*.class" />
+				<include name="**/markupWizard/dmc/client/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupWizard/dmc/GoldenGateDmcConstants.java" />
+				<include name="**/markupWizard/dmc/client/*.java" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	<target name="dpsmanager">
+		<delete file="${jar.dpsmanager}" />
+		<jar destfile="${jar.dpsmanager}" manifest="${file.home}/MANIFEST.components.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupWizard/dps/GoldenGateDmcConstants*.class" />
+				<include name="**/markupWizard/dps/client/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupWizard/dps/GoldenGateDmcConstants.java" />
+				<include name="**/markupWizard/dps/client/*.java" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	
+	<target name="wizard" if="${gg.exists}" depends="check-gg,markupwizardzip,mwpackerzip">
+	</target>
+	
+	<target name="markupwizardzip" depends="markupwizardjar,mwstarterjar">
+		<delete file="${app.wizard}" />
+		<zip destfile="${app.wizard}">
+			<fileset dir="${file.home}/wizard" />
+			<fileset dir="${dist.home}/Wizard" />
+			<fileset dir="${lib.home}" includes="EasyIO.jar" />
+			<fileset dir="${lib.home}" includes="Gamta.jar" />
+			<fileset dir="${lib.home}" includes="GoldenGATE.jar" />
+			<fileset dir="${lib.home}" includes="HtmlXmlUtil.jar" />
+			<fileset dir="${lib.home}" includes="mail.jar" />
+			<fileset dir="${lib.home}" includes="StringUtils.jar" />
+			<fileset dir="." includes="LICENSE.txt"/>
+		</zip>
+	</target>
+	
+	<target name="markupwizardjar">
+		<delete file="${jar.wizard}"/>
+		<jar destfile="${jar.wizard}" manifest="${file.home}/MANIFEST.wizard.MF">
+			<fileset dir="${build.home}/classes">
+				<include name="**/markupWizard/*.class" />
+				<include name="**/markupWizard/app/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/markupWizard/*.class" />
+				<include name="**/markupWizard/app/*.class" />
+			</fileset>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	<target name="mwstarterjar">
+		<delete file="${jar.wizardstarter}"/>
+		<jar destfile="${jar.wizardstarter}" manifest="${file.home}/MANIFEST.starter.MF">
+			<fileset dir="${build.home}/classes" includes="**/markupWizard/app/starter/*.class"/>
+			<fileset dir="${src.home}" includes="**/markupWizard/app/starter/*.java"/>
+			<fileset dir="${build.home}/classes" includes="**/goldenGate/*.class"/>
+			<fileset dir="../goldengate-editor/src" includes="**/goldenGate/GoldenGateConstants.java"/>
+			<fileset dir="${build.home}/classes" includes="**/goldenGate/util/*.class"/>
+			<fileset dir="../goldengate-editor/src" includes="**/goldenGate/util/UpdateUtils.java"/>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+	
+	<target name="mwpackerzip" depends="mwpackerjar">
+		<delete file="${app.mwpacker}"/>
+		<zip destfile="${app.mwpacker}">
+			<fileset dir="${file.home}/mwpacker"/>
+			<fileset dir="${dist.home}/" includes="_DocumentGatewayPacker.jar"/>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</zip>
+	</target>
+	
+	<target name="mwpackerjar">
+		<delete file="${jar.wizardpacker}"/>
+		<jar destfile="${jar.wizardpacker}" manifest="${file.home}/MANIFEST.mwpacker.MF">
+			<fileset dir="${build.home}/classes" includes="**/markupWizard/app/utilities/*.class"/>
+			<fileset dir="${src.home}" includes="**/markupWizard/app/utilities/*.java"/>
+			<fileset dir="${build.home}/classes" includes="**/utilities/PackerUtils*.class"/>
+			<fileset dir="../goldengate-editor/src" includes="**/utilities/PackerUtils.java"/>
+			<fileset dir="." includes="LICENSE.txt"/>
+		</jar>
+	</target>
+</project>

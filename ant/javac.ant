@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+	Handles the compilation step itself. Especially the classpath is set up
+	here.
+-->
+
+<project name="javac">
+	
+	<!-- set up the classpath for compilation, this should always match the Eclipse configuration. -->
+	<path id="compile.classpath">
+		<!-- include all .jar in the lib/ directory -->
+	    <fileset dir="${lib.home}">
+	        <include name="*.jar" />
+	    </fileset>
+	</path>
+	
+	<!-- The task off all tasks -->
+	<target name="compile" depends="compileSvr,compileEdt,compileMwPacker" description="Compile GoldenGATE Server Java sources">
+		<!-- only proxy for three compile tasks -->
+	</target>
+	
+	<!-- Compile server components only if server available -->
+	<target name="check-ggs" unless="ggs.exists">
+		<available property="ggs.exists" file="lib/GgServer.jar"/>
+	</target>
+	<target name="compileSvr" depends="check-ggs" if="${ggs.exists}" description="Compile GoldenGATE Server component Java sources">
+		
+	    <!-- Compile Java classes as necessary -->
+	    <javac destdir="${build.home}/classes" includeantruntime="false" >
+	    	<src path="${src.home}" />
+    		<include name="**/markupWizard/*.java" />
+			<include name="**/markupWizard/dmc/*.java" />
+			<include name="**/markupWizard/dps/*.java" />
+	        <classpath refid="compile.classpath" />
+	    </javac>
+	</target>
+	
+	<!-- Compile GoldenGATE Editor client plugins if GoldenGATE.jar available -->
+	<target name="check-gg" unless="gg.exists">
+		<available property="gg.exists" file="../goldengate-editor/dist/GoldenGATE.jar"/>
+	</target>
+	<target name="compileEdt" depends="check-gg,fetch-starter" if="${gg.exists}" description="Compile GoldenGATE Editor plugin Java sources">
+		
+	    <!-- Compile Java classes as necessary -->
+	    <javac destdir="${build.home}/classes" includeantruntime="false" >
+	    	<src path="${src.home}" />
+    		<include name="**/markupProcess/*.java" />
+    		<include name="**/markupWizard/*.java" />
+    		<include name="**/markupWizard/app/*.java" />
+    		<include name="**/markupWizard/app/starter/*.java" />
+			<include name="**/markupWizard/dmc/GoldenGateDmcConstants.java" />
+			<include name="**/markupWizard/dmc/client/*.java" />
+			<include name="**/markupWizard/dps/GoldenGateDpsConstants.java" />
+			<include name="**/markupWizard/dps/client/*.java" />
+			<include name="**/markupWizard/manager/*.java" />
+	    	
+	    	<src path="../goldengate-editor/src" />
+			<include name="**/goldenGate/GoldenGateConstants.java" />
+			<include name="**/goldenGate/util/UpdateUtils.java" />
+			
+	        <classpath refid="compile.classpath" />
+	    </javac>
+	</target>
+	<target name="fetch-starter">
+    	
+	</target>
+	
+	<!-- Compile packer utility for document gateway -->
+	<target name="compileMwPacker" description="Compile markup wizard packer tool">
+		
+	    <!-- Compile Java classes as necessary -->
+	    <javac destdir="${build.home}/classes" includeantruntime="false" >
+	    	<src path="${src.home}" />
+    		<include name="**/markupWizard/app/utilities/*.java" />
+	    	
+	    	<src path="../goldengate-editor/src" />
+			<include name="**/goldenGate/utilities/PackerUtils.java" />
+	    </javac>
+	</target>
+</project>

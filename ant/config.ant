@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- the project global configuration for the build system.
+ 
+ Please: be very careful when modifing this, as this file lives in GIT and you can easily break
+ other peoples system when commiting changes to this file. -->
+
+<project name="config">
+	
+	<!-- =================================================================== -->
+	<!-- DIRECTORY CONFIGURATION -->
+	
+	<!-- root directory of the common source tree -->
+	<property name="src.home" value="src" />
+	
+	<!-- directory that contains all libraries that are required in the .war -->
+	<property name="lib.home" value="lib" />
+	
+	<!-- build directory that will contain all the .jars and what else is required for a .war -->
+	<property name="build.home" value="build" />
+	
+	<!-- build directory that contains all files to include in the .zips except for the .jars -->
+	<property name="file.home" value="files" />
+	
+	<!-- directory that contains packed archives, such as the .war -->
+	<property name="dist.home" value="dist" />
+	
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.processmanager" value="${dist.home}/Plugins/MarkupProcess.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.wizard" value="${dist.home}/Wizard/GgMarkupWizard.jar" />
+	
+	<!-- path to the application .zip file that shall be created -->
+	<property name="jar.wizardstarter" value="${dist.home}/Wizard/GgMarkupWizardStarter.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.wizardmanager" value="${dist.home}/Plugins/MarkupWizard.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.wizardpacker" value="${dist.home}/_GgMarkupWizardPacker.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.dmc" value="${dist.home}/Components/GgServerDMC.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.dmcmanager" value="${dist.home}/Plugins/DmcProcessManager.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.dps" value="${dist.home}/Components/GgServerDPS.jar" />
+	
+	<!-- path to the .jar file that shall be created -->
+	<property name="jar.dpsmanager" value="${dist.home}/Plugins/DpsConfigurationManager.jar" />
+	
+	
+	<!-- path to the application .zip file that shall be created -->
+	<property name="pack.serverprocess" value="${dist.home}/GgServer.process.zip" />
+	
+	
+	<!-- path to the application .zip file that shall be created -->
+	<property name="app.wizard" value="${dist.home}/GgMarkupWizard.zip" />
+	
+	<!-- path to the application .zip file that shall be created -->
+	<property name="app.mwpacker" value="${dist.home}/MarkupWizardPacker.zip" />
+</project>
