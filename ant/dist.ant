@@ -167,14 +167,14 @@
 		<delete file="${app.mwpacker}"/>
 		<zip destfile="${app.mwpacker}">
 			<fileset dir="${file.home}/mwpacker"/>
-			<fileset dir="${dist.home}/" includes="_DocumentGatewayPacker.jar"/>
+			<fileset dir="${dist.home}/" includes="_VersionPacker.markupWizard.jar"/>
 			<fileset dir="." includes="LICENSE.txt"/>
 		</zip>
 	</target>
 	
 	<target name="mwpackerjar">
 		<delete file="${jar.wizardpacker}"/>
-		<jar destfile="${jar.wizardpacker}" manifest="${file.home}/MANIFEST.mwpacker.MF">
+		<jar destfile="${jar.wizardpacker}" manifest="${file.home}/MANIFEST.versionpacker.MF">
 			<fileset dir="${build.home}/classes" includes="**/markupWizard/app/utilities/*.class"/>
 			<fileset dir="${src.home}" includes="**/markupWizard/app/utilities/*.java"/>
 			<fileset dir="${build.home}/classes" includes="**/utilities/PackerUtils*.class"/>

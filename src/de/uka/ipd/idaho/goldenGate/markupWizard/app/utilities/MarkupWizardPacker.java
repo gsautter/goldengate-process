@@ -110,7 +110,7 @@ public class MarkupWizardPacker {
 		
 		for (int s = 0; s < specialFiles.length; s++) {
 			
-			//	if config name specified, generate respectiv cnfg file
+			//	if config name specified, generate respective cnfg file
 			if ("GgMarkupWizard.cnfg".equals(specialFiles[s]) && (configName != null)) {
 				PackerUtils.writeZipFileEntry(new InputStream() {
 					String data = "WizardName = \"" + configName + "\";";
@@ -123,7 +123,7 @@ public class MarkupWizardPacker {
 				}, specialFiles[s], markupWizardZipper);
 			}
 			
-			//	ciopy forward readme file from configuration
+			//	copy forward readme file from configuration
 			else if (PackerUtils.README_FILE_NAME.equals(specialFiles[s])) {
 				File specialFile = new File(rootFolder, ("Configurations/" + configName + "/" + PackerUtils.README_FILE_NAME));
 				PackerUtils.writeZipFileEntry(specialFile, PackerUtils.README_FILE_NAME, markupWizardZipper);
@@ -131,7 +131,7 @@ public class MarkupWizardPacker {
 			
 			//	copy other files, and use default config name if none specified
 			else {
-				File specialFile = new File(rootFolder, ("_MarkupWizardPacker." + specialFiles[s]));
+				File specialFile = new File(rootFolder, ("_VersionPacker.markupWizard." + specialFiles[s]));
 				PackerUtils.writeZipFileEntry(specialFile, specialFiles[s], markupWizardZipper);
 			}
 		}
@@ -169,9 +169,8 @@ public class MarkupWizardPacker {
 	private static final String getConfigurationName(File rootFolder) throws IOException {
 		File cnfgFile = new File(rootFolder, "GgMarkupWizard.cnfg");
 		BufferedReader br = new BufferedReader(new FileReader(cnfgFile));
-		String cnfgLine;
 		String configName = null;
-		while ((cnfgLine = br.readLine()) != null) {
+		for (String cnfgLine; (cnfgLine = br.readLine()) != null;) {
 			cnfgLine = cnfgLine.trim();
 			if (cnfgLine.startsWith("WizardName"))
 				configName = cnfgLine.substring(cnfgLine.indexOf('"') + 1, cnfgLine.lastIndexOf('"'));
@@ -183,14 +182,14 @@ public class MarkupWizardPacker {
 	private static String[] getCoreFileNames(File rootFolder) throws IOException {
 		Set coreFiles = new TreeSet();
 		
-		File coreFileList = new File(rootFolder, "_MarkupWizardPacker.cnfg");
+		File coreFileList = new File(rootFolder, "_VersionPacker.markupWizard.cnfg");
 		BufferedReader br = new BufferedReader(new FileReader(coreFileList));
-		String coreFile;
-		while ((coreFile = br.readLine()) != null) {
+		for (String coreFile; (coreFile = br.readLine()) != null;) {
 			coreFile = coreFile.trim();
 			if ((coreFile.length() != 0) && !coreFile.startsWith("//"))
 				coreFiles.add(coreFile);
 		}
+		br.close();
 		
 		for (int s = 0; s < specialFiles.length; s++)
 			coreFiles.remove(specialFiles[s]);

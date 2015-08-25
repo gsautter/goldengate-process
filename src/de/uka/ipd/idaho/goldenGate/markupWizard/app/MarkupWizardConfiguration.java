@@ -99,7 +99,14 @@ public class MarkupWizardConfiguration implements GoldenGateConfiguration {
 	public String getHelpBaseURL() {
 		return this.ggConfig.getHelpBaseURL();
 	}
-
+	
+	/* (non-Javadoc)
+	 * @see de.uka.ipd.idaho.goldenGate.GoldenGateConfiguration#getHelpDataProvider()
+	 */
+	public GoldenGatePluginDataProvider getHelpDataProvider() {
+		return this.ggConfig.getHelpDataProvider();
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.uka.ipd.idaho.goldenGate.GoldenGateConfiguration#getIconImage()
 	 */

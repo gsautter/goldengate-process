@@ -67,6 +67,7 @@
 		<available property="dio.exists" file="../goldengate-server-docs/dist/Components/GgServerDIO.jar"/>
 	</target>
 	<target name="fetch-dio" depends="check-fetch-dio" if="${dio.exists}">
+    	<copy file="../goldengate-server-docs/dist/Components/Bin/GgServerDST.jar" todir="${lib.home}" overwrite="true" verbose="false" />
     	<copy file="../goldengate-server-docs/dist/Components/GgServerDIO.jar" todir="${lib.home}" overwrite="true" verbose="false" />
 	</target>
 	
@@ -74,6 +75,7 @@
 		<available property="authman.exists" file="../goldengate-server/dist/Plugins/AuthManagerPlugin.jar"/>
 	</target>
 	<target name="fetch-authman" depends="check-fetch-authman" if="${authman.exists}">
+    	<copy file="../goldengate-server/dist/Plugins/Bin/GgServerClient.jar" todir="${lib.home}" overwrite="true" verbose="false" />
     	<copy file="../goldengate-server/dist/Plugins/AuthManagerPlugin.jar" todir="${lib.home}" overwrite="true" verbose="false" />
 	</target>
 	

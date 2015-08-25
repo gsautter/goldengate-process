@@ -34,11 +34,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -78,8 +84,11 @@ public class GoldenGateMarkupWizardApplication implements GoldenGateConstants {
 	private static Settings PARAMETERS = new Settings();
 	private static StringVector CONFIG_HOSTS = new StringVector();
 	
+	private static final String LOG_TIMESTAMP_DATE_FORMAT = "yyyyMMdd-HHmm";
+	private static final DateFormat LOG_TIMESTAMP_FORMATTER = new SimpleDateFormat(LOG_TIMESTAMP_DATE_FORMAT);
+	
 	/**	the main method to run GoldenGATE as a standalone application
-	 * @param args the arguments, which ahve the following meaning:<ul>
+	 * @param args the arguments, which have the following meaning:<ul>
 	 * <li>args[0]: the RUN parameter (if not specified, the GoldenGATE.bat startup script will be created)</li>
 	 * <li>args[1]: the ONLINE parameter (if not specified, GoldenGATE will run purely offline and will not allow its plugin components to access the network or WWW)</li>
 	 * <li>args[2]: the root path of the GoldenGATE installation (if not specified, GoldenGATE will use the current path instead, i.e. './')</li>
@@ -114,14 +123,20 @@ public class GoldenGateMarkupWizardApplication implements GoldenGateConstants {
 		String basePath = "./";
 		String fileToOpen = null;
 		boolean log = false;
+		String logFileName = ("GgMarkupWizard." + LOG_TIMESTAMP_FORMATTER.format(new Date()) + ".log");
 		
 		//	parse remaining args
 		for (int a = 1; a < args.length; a++) {
 			String arg = args[a];
 			if (arg != null) {
-				if (arg.startsWith(BASE_PATH_PARAMETER + "=")) basePath = arg.substring((BASE_PATH_PARAMETER + "=").length());
-				else if (ONLINE_PARAMETER.equals(arg)) ONLINE = true;
-				else if (LOG_PARAMETER.equals(arg)) log = true;
+				if (arg.startsWith(BASE_PATH_PARAMETER + "="))
+					basePath = arg.substring((BASE_PATH_PARAMETER + "=").length());
+				else if (ONLINE_PARAMETER.equals(arg))
+					ONLINE = true;
+				else if (arg.equals(LOG_PARAMETER + "=IDE") || arg.equals(LOG_PARAMETER + "=NO"))
+					logFileName = null;
+				else if (arg.startsWith(LOG_PARAMETER + "="))
+					logFileName = arg.substring((LOG_PARAMETER + "=").length());
 				else if (fileToOpen == null) fileToOpen = arg;
 			}
 		}
@@ -159,6 +174,58 @@ public class GoldenGateMarkupWizardApplication implements GoldenGateConstants {
 			if (PARAMETERS.containsKey(PROXY_USER) && PARAMETERS.containsKey(PROXY_PWD)) {
 				//	initialize proxy authentication
 			}
+		}
+		
+		//	create log files if required
+		File logFolder = null;
+		File logFileOut = null;
+		File logFileErr = null;
+		if (logFileName != null) try {
+			
+			//	truncate log file extension
+			if (logFileName.endsWith(".log"))
+				logFileName = logFileName.substring(0, (logFileName.length() - ".log".length()));
+			
+			//	create absolute log files
+			if (logFileName.startsWith("/") || (logFileName.indexOf(':') != -1)) {
+				logFileOut = new File(logFileName + ".out.log");
+				logFileErr = new File(logFileName + ".err.log");
+				logFolder = logFileOut.getAbsoluteFile().getParentFile();
+			}
+			
+			//	create relative log files (the usual case)
+			else {
+				
+				//	get log path
+				String logFolderName = PARAMETERS.getSetting(LOG_PATH, LOG_FOLDER_NAME);
+				if (logFolderName.startsWith("/") || (logFolderName.indexOf(':') != -1))
+					logFolder = new File(logFolderName);
+				else logFolder = new File(BASE_PATH, logFolderName);
+				logFolder = logFolder.getAbsoluteFile();
+				logFolder.mkdirs();
+				
+				//	create log files
+				logFileOut = new File(logFolder, (logFileName + ".out.log"));
+				logFileErr = new File(logFolder, (logFileName + ".err.log"));
+			}
+			
+			//	redirect System.out
+			logFileOut.getParentFile().mkdirs();
+			logFileOut.createNewFile();
+			System.setOut(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFileOut)), true, "UTF-8"));
+			
+			//	redirect System.err
+			logFileErr.getParentFile().mkdirs();
+			logFileErr.createNewFile();
+			System.setErr(new PrintStream(new BufferedOutputStream(new FileOutputStream(logFileErr)), true, "UTF-8"));
+		}
+		catch (Exception e) {
+			JOptionPane.showMessageDialog(null, "Could not create log files in folder '" + logFolder.getAbsolutePath() + "'." +
+					"\nCommon reasons are a full hard drive, lack of write permissions to the folder, or system protection software." +
+					"\nUse the 'Configure' button in the configuration selector dialog to select a different log location." +
+					"\nThen exit and re-start GoldenGATE Editor to apply the change." +
+					"\n\nNote that you can work normally without the log files, it's just that in case of an error, there are" +
+					"\nno log files to to help investigate what exactly went wrong and help developers fix the problem.", "Error Creating Log Files", JOptionPane.ERROR_MESSAGE);
 		}
 		
 		//	load configuration hosts
@@ -204,7 +271,8 @@ public class GoldenGateMarkupWizardApplication implements GoldenGateConstants {
 			//	local configuration selected
 			if (configuration.host == null) {
 				File configRoot = new File(new File(BASE_PATH, CONFIG_FOLDER_NAME), configuration.name);
-				ggConfiguration = new FileConfiguration(configuration.name, configRoot, false, ONLINE, (log ? new File(BASE_PATH, ("GgMarkupWizard." + System.currentTimeMillis() + ".log")) : null));
+//				ggConfiguration = new FileConfiguration(configuration.name, configRoot, false, ONLINE, (log ? new File(BASE_PATH, ("GgMarkupWizard." + System.currentTimeMillis() + ".log")) : null));
+				ggConfiguration = new FileConfiguration(configuration.name, configRoot, false, ONLINE, null);
 			}
 			
 			//	remote configuration selected

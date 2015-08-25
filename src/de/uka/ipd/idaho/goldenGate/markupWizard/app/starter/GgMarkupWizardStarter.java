@@ -30,17 +30,11 @@ package de.uka.ipd.idaho.goldenGate.markupWizard.app.starter;
 
 import java.awt.Toolkit;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -57,15 +51,15 @@ import de.uka.ipd.idaho.goldenGate.util.UpdateUtils.UpdateStatusDialog;
  */
 public class GgMarkupWizardStarter implements GoldenGateConstants {
 //	private static final boolean DEBUG_BOOTSTRAP_START = true;
-	
-	private static boolean batchRun = false;
-	
-	private static boolean logSystemOut = false;
-	private static boolean logError = false;
-	
-	private static final String LOG_TIMESTAMP_DATE_FORMAT = "yyyyMMdd-HHmm";
-	private static final DateFormat LOG_TIMESTAMP_FORMATTER = new SimpleDateFormat(LOG_TIMESTAMP_DATE_FORMAT);
-	
+//	
+//	private static boolean batchRun = false;
+//	
+//	private static boolean logSystemOut = false;
+//	private static boolean logError = false;
+//	
+//	private static final String LOG_TIMESTAMP_DATE_FORMAT = "yyyyMMdd-HHmm";
+//	private static final DateFormat LOG_TIMESTAMP_FORMATTER = new SimpleDateFormat(LOG_TIMESTAMP_DATE_FORMAT);
+//	
 //	private static final DateFormat UPDATE_TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyyMMdd-HHmm");
 //	
 	/**
@@ -84,15 +78,25 @@ public class GgMarkupWizardStarter implements GoldenGateConstants {
 		StringBuffer argAssembler = new StringBuffer();
 		for (int a = 0; a < args.length; a++) {
 			String arg = args[a];
-			if (arg != null) {
-				if (arg.startsWith(BASE_PATH_PARAMETER + "=")) dataBasePath = arg.substring((BASE_PATH_PARAMETER + "=").length());
-				else if (RUN_PARAMETER.equals(arg)) batchRun = true;
-				else {
-					if ((arg.indexOf(' ') != -1) && !arg.startsWith("\""))
-						arg = ("\"" + arg + "\"");
-					argAssembler.append(" " + arg);
-				}
+			if (arg == null)
+				continue;
+			if (arg.startsWith(BASE_PATH_PARAMETER + "="))
+				dataBasePath = arg.substring((BASE_PATH_PARAMETER + "=").length());
+			else {
+				if ((arg.indexOf(' ') != -1) && !arg.startsWith("\""))
+					arg = ("\"" + arg + "\"");
+				argAssembler.append(" " + arg);
 			}
+//			String arg = args[a];
+//			if (arg != null) {
+//				if (arg.startsWith(BASE_PATH_PARAMETER + "=")) dataBasePath = arg.substring((BASE_PATH_PARAMETER + "=").length());
+//				else if (RUN_PARAMETER.equals(arg)) batchRun = true;
+//				else {
+//					if ((arg.indexOf(' ') != -1) && !arg.startsWith("\""))
+//						arg = ("\"" + arg + "\"");
+//					argAssembler.append(" " + arg);
+//				}
+//			}
 		}
 		File basePath = new File(dataBasePath);
 		
@@ -107,15 +111,22 @@ public class GgMarkupWizardStarter implements GoldenGateConstants {
 			BufferedReader parameterReader = new BufferedReader(new FileReader(new File(basePath, PARAMETER_FILE_NAME)));
 			String line;
 			while ((line = parameterReader.readLine())  != null) {
-				if (line.startsWith(START_MEMORY_NAME + "=")) startMemory = line.substring(START_MEMORY_NAME.length() + 1).trim();
-				else if (line.startsWith(MAX_MEMORY_NAME + "=")) maxMemory = line.substring(MAX_MEMORY_NAME.length() + 1).trim();
-				else if (line.startsWith(PROXY_NAME + "=")) proxyName = line.substring(PROXY_NAME.length() + 1).trim();
-				else if (line.startsWith(PROXY_PORT + "=")) proxyPort = line.substring(PROXY_PORT.length() + 1).trim();
-				else if (line.startsWith(PROXY_USER + "=")) proxyUser = line.substring(PROXY_USER.length() + 1).trim();
-				else if (line.startsWith(PROXY_PWD + "=")) proxyPwd = line.substring(PROXY_PWD.length() + 1).trim();
-				else if (line.startsWith(LOG_SYSTEM_OUT + "=")) logSystemOut = true;
-				else if (line.startsWith(LOG_ERROR + "=")) logError = true;
+				if (line.startsWith(START_MEMORY_NAME + "="))
+					startMemory = line.substring(START_MEMORY_NAME.length() + 1).trim();
+				else if (line.startsWith(MAX_MEMORY_NAME + "="))
+					maxMemory = line.substring(MAX_MEMORY_NAME.length() + 1).trim();
+				else if (line.startsWith(PROXY_NAME + "="))
+					proxyName = line.substring(PROXY_NAME.length() + 1).trim();
+				else if (line.startsWith(PROXY_PORT + "="))
+					proxyPort = line.substring(PROXY_PORT.length() + 1).trim();
+				else if (line.startsWith(PROXY_USER + "="))
+					proxyUser = line.substring(PROXY_USER.length() + 1).trim();
+				else if (line.startsWith(PROXY_PWD + "="))
+					proxyPwd = line.substring(PROXY_PWD.length() + 1).trim();
+//				else if (line.startsWith(LOG_SYSTEM_OUT + "=")) logSystemOut = true;
+//				else if (line.startsWith(LOG_ERROR + "=")) logError = true;
 			}
+			parameterReader.close();
 		}
 		catch (FileNotFoundException fnfe) {
 			System.out.println("GgMarkupWizardStarter: " + fnfe.getClass().getName() + " (" + fnfe.getMessage() + ") while reading GoldenGATE Markup Wizard startup parameters.");
@@ -162,48 +173,48 @@ public class GgMarkupWizardStarter implements GoldenGateConstants {
 		String command = "java -jar -Xms" + startMemory + "m -Xmx" + maxMemory + "m GgMarkupWizard.jar " + RUN_PARAMETER + (online ? (" " + ONLINE_PARAMETER) : "") + argAssembler.toString();
 		System.out.println("GgMarkupWizardStarter: command is '" + command + "'");
 		final Process ggProcess = Runtime.getRuntime().exec(command, null, basePath);
-		
-		//	redirect output
-		String logTimestamp = LOG_TIMESTAMP_FORMATTER.format(new Date());
-		
-		sd.setTitle(STATUS_DIALOG_MAIN_TITLE + " - Setting Up Logging");
-		final BufferedReader ggSystemOutReader = (logSystemOut ? new BufferedReader(new InputStreamReader(ggProcess.getInputStream())) : null);
-		final BufferedWriter ggSystemOutLogger = ((batchRun || !logSystemOut) ? null : new BufferedWriter(new FileWriter(new File(basePath, ("GgMwSystemOut." + logTimestamp + ".log")), true)));
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					while (logSystemOut) {
-						String s = ggSystemOutReader.readLine();
-						if (s != null) {
-							if (batchRun) System.out.println(s);
-							else {
-								ggSystemOutLogger.write(s);
-								ggSystemOutLogger.newLine();
-							}
-						}
-					}
-				} catch (IOException ioe) {}
-			}
-		}).start();
-		
-		final BufferedReader ggErrorReader = (logError ? new BufferedReader(new InputStreamReader(ggProcess.getErrorStream())) : null);
-		final BufferedWriter ggErrorLogger = ((batchRun || !logError) ? null : new BufferedWriter(new FileWriter(new File(basePath, ("GgMwError." + logTimestamp + ".log")), true)));
-		new Thread(new Runnable() {
-			public void run() {
-				try {
-					while (logError) {
-						String s = ggErrorReader.readLine();
-						if (s != null) {
-							if (batchRun) System.out.println(s);
-							else {
-								ggErrorLogger.write(s);
-								ggErrorLogger.newLine();
-							}
-						}
-					}
-				} catch (IOException ioe) {}
-			}
-		}).start();
+//		
+//		//	redirect output
+//		String logTimestamp = LOG_TIMESTAMP_FORMATTER.format(new Date());
+//		
+//		sd.setTitle(STATUS_DIALOG_MAIN_TITLE + " - Setting Up Logging");
+//		final BufferedReader ggSystemOutReader = (logSystemOut ? new BufferedReader(new InputStreamReader(ggProcess.getInputStream())) : null);
+//		final BufferedWriter ggSystemOutLogger = ((batchRun || !logSystemOut) ? null : new BufferedWriter(new FileWriter(new File(basePath, ("GgMwSystemOut." + logTimestamp + ".log")), true)));
+//		new Thread(new Runnable() {
+//			public void run() {
+//				try {
+//					while (logSystemOut) {
+//						String s = ggSystemOutReader.readLine();
+//						if (s != null) {
+//							if (batchRun) System.out.println(s);
+//							else {
+//								ggSystemOutLogger.write(s);
+//								ggSystemOutLogger.newLine();
+//							}
+//						}
+//					}
+//				} catch (IOException ioe) {}
+//			}
+//		}).start();
+//		
+//		final BufferedReader ggErrorReader = (logError ? new BufferedReader(new InputStreamReader(ggProcess.getErrorStream())) : null);
+//		final BufferedWriter ggErrorLogger = ((batchRun || !logError) ? null : new BufferedWriter(new FileWriter(new File(basePath, ("GgMwError." + logTimestamp + ".log")), true)));
+//		new Thread(new Runnable() {
+//			public void run() {
+//				try {
+//					while (logError) {
+//						String s = ggErrorReader.readLine();
+//						if (s != null) {
+//							if (batchRun) System.out.println(s);
+//							else {
+//								ggErrorLogger.write(s);
+//								ggErrorLogger.newLine();
+//							}
+//						}
+//					}
+//				} catch (IOException ioe) {}
+//			}
+//		}).start();
 		
 		//	close startup frame
 		sd.dispose();
@@ -215,20 +226,20 @@ public class GgMarkupWizardStarter implements GoldenGateConstants {
 					int ggExit = ggProcess.waitFor();
 					System.out.println("GoldenGATE Markup Wizard terminead: " + ggExit);
 				} catch (Exception e) {}
-				try {
-					ggSystemOutReader.close();
-					if (!batchRun && logSystemOut) {
-						ggSystemOutLogger.flush();
-						ggSystemOutLogger.close();
-					}
-				} catch (Exception e) {}
-				try {
-					ggErrorReader.close();
-					if (!batchRun && logError) {
-						ggErrorLogger.flush();
-						ggErrorLogger.close();
-					}
-				} catch (Exception e) {}
+//				try {
+//					ggSystemOutReader.close();
+//					if (!batchRun && logSystemOut) {
+//						ggSystemOutLogger.flush();
+//						ggSystemOutLogger.close();
+//					}
+//				} catch (Exception e) {}
+//				try {
+//					ggErrorReader.close();
+//					if (!batchRun && logError) {
+//						ggErrorLogger.flush();
+//						ggErrorLogger.close();
+//					}
+//				} catch (Exception e) {}
 				System.exit(0);
 			}
 		}).start();
